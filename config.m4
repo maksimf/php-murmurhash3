@@ -6,5 +6,5 @@ if test "$PHP_MURMURHASH3" = "yes"; then
   PHP_ADD_LIBRARY(stdc++,,MURMURHASH3_SHARED_LIBADD)
   PHP_SUBST(MURMURHASH3_SHARED_LIBADD)
   AC_DEFINE(HAVE_MURMURHASH3, 1, [Whether you have murmurhash3])
-  PHP_NEW_EXTENSION(murmurhash3, php_murmurhash3.cpp MurmurHash3.cpp, $ext_shared)
+  PHP_NEW_EXTENSION(murmurhash3, php_murmurhash3.cpp, $ext_shared)
 fi

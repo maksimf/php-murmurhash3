@@ -49,13 +49,49 @@ void c2h(uint8_t c, char *r)
   r[1] = hex[c % 16];
 }
 
+uint32_t murmur3_32(const uint8_t* key, size_t len, uint32_t seed) {
+  uint32_t h = seed;
+  if (len > 3) {
+    const uint32_t* key_x4 = (const uint32_t*) key;
+    size_t i = len >> 2;
+    do {
+      uint32_t k = *key_x4++;
+      k *= 0xcc9e2d51;
+      k = (k << 15) | (k >> 17);
+      k *= 0x1b873593;
+      h ^= k;
+      h = (h << 13) | (h >> 19);
+      h += (h << 2) + 0xe6546b64;
+    } while (--i);
+    key = (const uint8_t*) key_x4;
+  }
+  if (len & 3) {
+    size_t i = len & 3;
+    uint32_t k = 0;
+    key = &key[i - 1];
+    do {
+      k <<= 8;
+      k |= *key--;
+    } while (--i);
+    k *= 0xcc9e2d51;
+    k = (k << 15) | (k >> 17);
+    k *= 0x1b873593;
+    h ^= k;
+  }
+  h ^= len;
+  h ^= h >> 16;
+  h *= 0x85ebca6b;
+  h ^= h >> 13;
+  h *= 0xc2b2ae35;
+  h ^= h >> 16;
+  return h;
+}
+
 PHP_FUNCTION(murmurhash3)
 {
     char *key;
     int key_len;
     long seed;
-    char output[MURMURHASH3_OUTPUT_LENGTH + 1];
-    char result[MURMURHASH3_OUTPUT_LENGTH * 2 + 1];
 
     // Parse the input parameters
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "sl", &key, &key_len, &seed) == FAILURE) {
@@ -63,15 +99,8 @@ PHP_FUNCTION(murmurhash3)
     }
 
     // Calculate the hash
-    MurmurHash3_x64_128 ( key, key_len, (uint32_t)seed, output );
-    output[MURMURHASH3_OUTPUT_LENGTH] = 0;
-
-    // Convert to HEX
-    for (int i=0; i<MURMURHASH3_OUTPUT_LENGTH; i++) {
-      c2h(output[i], &result[i*2]);
-    }
-    result[MURMURHASH3_OUTPUT_LENGTH * 2] = 0;
+    long result = long(murmur3_32((uint8_t*)key, (size_t)key_len, (uint32_t)seed));
 
     // Return the result
-    RETURN_STRING(result, 1);
+    RETURN_LONG(result);
 }
