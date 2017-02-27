@@ -1,6 +1,6 @@
 # PHP MurmurHash3
 
-*MurmurHash* is a algorithm desiged by Austin Appleby.
+*MurmurHash* is an algorithm desiged by Austin Appleby.
 
 This is a fork of PHP extension authored by j42. The original extension didn't work correct with the certain data.
 
