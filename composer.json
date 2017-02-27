@@ -1,5 +1,5 @@
 {
-    "name": "max/php-murmurhash3",
+    "name": "maksimf/php-murmurhash3",
     "description": "PHP Murmurhash3 algorithm implementation",
     "type": "library",
     "license": "MIT",
